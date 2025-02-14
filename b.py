@@ -18,6 +18,7 @@ from bs4 import BeautifulSoup
 from urllib.parse import urljoin, urlparse
 from datetime import datetime
 import pytz
+import asyncio
 
 # Setup logging
 logging.basicConfig(
@@ -448,9 +449,20 @@ def main():
     app.add_handler(MessageHandler(addsudo, filters.command("addsudo") & filters.create(is_authorized)))
     app.add_handler(MessageHandler(removesudo, filters.command("removesudo") & filters.create(is_authorized)))
     
-    # Start scheduler and bot
-    scheduler.start()
-    app.run()
+    # Start the bot and scheduler
+    async def run():
+        await app.start()
+        scheduler.start()
+        await asyncio.Event().wait()  # Keep the bot running
+
+    # Run the bot
+    try:
+        asyncio.run(run())
+    except KeyboardInterrupt:
+        logger.info("Bot stopped by user")
+    finally:
+        scheduler.shutdown()
+        app.stop()
 
 if __name__ == "__main__":
     main()
