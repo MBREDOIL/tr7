@@ -108,7 +108,7 @@ async def download_file(url, custom_name=None):
                     else:
                         ext = '.bin'
 
-                filename = re.sub(r'[\\/*?:"<>|]', '', (custom_name or os.path.basename(urlparse(url).path)) + ext
+                filename = re.sub(r'[\\/*?:"<>|]', '', (custom_name or os.path.basename(urlparse(url).path)) + ext)
                 async with aiofiles.open(filename, 'wb') as f:
                     await f.write(await response.read())
                     if os.path.getsize(filename) > MAX_FILE_SIZE:
